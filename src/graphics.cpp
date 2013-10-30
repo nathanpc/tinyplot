@@ -18,11 +18,9 @@ using namespace std;
  *  Constructor.
  */
 Graphics::Graphics() {
-	window = NULL;   // was 0
-	renderer = NULL; // was 0
+	window = NULL;
+	renderer = NULL;
 
-	frame_start = 0;
-	frame_time = 0;
 	running = false;
 }
 
@@ -73,16 +71,23 @@ bool Graphics::init(const char *title, int x, int y, int width, int height, int 
  *  Update stuff.
  */
 void Graphics::update() {
-	// Set to black.
-	SDL_SetRenderDrawColor(renderer, 240, 240, 240, 255);
+	SDL_SetRenderDrawColor(renderer, 0,0,0, 255);
+	SDL_RenderDrawLine(renderer, 10, 10, 200, 200);
 }
 
 /**
  *  Render stuff.
  */
 void Graphics::render() {
+	// Set the background color.
+	SDL_SetRenderDrawColor(renderer, 240, 240, 240, 255);
+
 	// Clear window.
 	SDL_RenderClear(renderer);
+
+	// Update the things on the screen.
+	//handle_events();
+	update();
 
 	// Show the window.
 	SDL_RenderPresent(renderer);
@@ -96,8 +101,6 @@ void Graphics::glLoop() {
 		frame_start = SDL_GetTicks();
 
 		// Main loop.
-		//handle_events();
-		update();
 		render();
 
 		frame_time = SDL_GetTicks() - frame_start;
@@ -114,4 +117,49 @@ void Graphics::clean() {
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
+}
+
+/**
+ *  Draws a texture.
+ *
+ *  @param texture The texture.
+ *  @param sx Source X position.
+ *  @param sy Source Y postition.
+ *  @param x Texture X position.
+ *  @param y Texture Y position.
+ *  @param width Texture width.
+ *  @param height Texture height.
+ */
+void Graphics::draw(SDL_Texture *texture, int sx, int sy, int x, int y, unsigned int width, unsigned int height) {
+	SDL_Rect source;
+	SDL_Rect destination;
+
+	// Get the texture size for the source rectangle.
+	SDL_QueryTexture(texture, NULL, NULL, &source.w, &source.h);
+
+	// Set the positions and sizes for everything.
+	source.x = sx * 37;
+	source.y = sy * 38;
+	source.w = 36;
+	source.h = 38;
+	destination.x = x;
+	destination.y = y;
+	destination.w = width;
+	destination.h = height;
+
+	// Copy the texture to the render buffer.
+	SDL_RenderCopy(renderer, texture, &source, &destination);
+}
+
+/**
+ *  Draws a texture.
+ *
+ *  @param texture The texture.
+ *  @param x Texture X position.
+ *  @param y Texture Y position.
+ *  @param width Texture width.
+ *  @param height Texture height.
+ */
+void Graphics::draw(SDL_Texture *texture, int x, int y, unsigned int width, unsigned int height) {
+	draw(texture, 0, 0, x, y, width, height);
 }

@@ -14,14 +14,14 @@
 
 class Graphics {
   private:
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-
 	uint32_t frame_start;
 	uint32_t frame_time;
 	int fps;
 
   public:
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+
 	bool running;
 	std::string error_message;
 
@@ -32,6 +32,9 @@ class Graphics {
 	void update();
 	void render();
 	void clean();
+
+	void draw(SDL_Texture *texture, int sx, int sy, int x, int y, unsigned int width, unsigned int height);
+	void draw(SDL_Texture *texture, int x, int y, unsigned int width, unsigned int height);
 
 	void glLoop();
 };
