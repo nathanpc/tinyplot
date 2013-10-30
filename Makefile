@@ -1,8 +1,10 @@
 CXX = clang++
 CXXSTD = c++11
-CXXFLAGS = -Wall -std=$(CXXSTD)
-#LDFLAGS = -lboost_filesystem -lboost_system
-OBJ = src/main.o
+
+CXXFLAGS = -Wall -std=$(CXXSTD) $(shell sdl2-config --cflags) $(shell pkg-config --cflags SDL2_image SDL2_ttf)
+LDFLAGS = $(shell sdl2-config --libs) $(shell pkg-config --libs SDL2_image SDL2_ttf)
+
+OBJ = src/main.o src/graphics.o src/clog.o
 PREFIX = /usr/bin
 NAME = tinyplot
 

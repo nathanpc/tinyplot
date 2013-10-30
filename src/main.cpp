@@ -6,13 +6,17 @@
  */
 
 #include <iostream>
-#include <string>
-#include <cstdint>
-#include <unistd.h>
+#include <cstdlib>
 
-using namespace std;
+#include "clog.h"
+#include "graphics.h"
 
 #define VERSION "0.1a"
+using namespace std;
+
+Graphics *graphics;
+
+void about();
 
 /**
  *  That old C thing.
@@ -22,7 +26,34 @@ using namespace std;
  *  @return Exit code.
  */
 int main(int argc, char *argv[]) {
-	//
+	// Print the usual "About" message.
+	about();
 
-	return 0;
+	// Initialize the graph window.
+	graphics = new Graphics();
+	graphics->running = graphics->init("tinyplot",
+									   SDL_WINDOWPOS_CENTERED,
+									   SDL_WINDOWPOS_CENTERED,
+									   1024,
+									   768,
+									   24,
+									   SDL_WINDOW_RESIZABLE |
+									   SDL_WINDOW_SHOWN);
+
+	if (!graphics->running) {
+		Log::Error(graphics->error_message);
+		return EXIT_FAILURE;
+	}
+
+	graphics->glLoop();
+
+	return EXIT_SUCCESS;
+}
+
+/**
+ *  About message.
+ */
+void about() {
+	cout << "tinyplot " << VERSION << endl;
+	cout << "Copyright (c) 2013 Nathan Campos" << endl;
 }
