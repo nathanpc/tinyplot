@@ -12,6 +12,7 @@
 #include <SDL.h>
 
 #include "graphics.h"
+#include "plot.h"
 using namespace std;
 
 /**
@@ -20,6 +21,7 @@ using namespace std;
 Graphics::Graphics() {
 	window = NULL;
 	renderer = NULL;
+	plot = NULL;
 
 	running = false;
 }
@@ -63,6 +65,7 @@ bool Graphics::init(const char *title, int x, int y, int width, int height, int 
 	}
 
 	this->fps = fps;
+	plot = new Plot(width, height);
 
 	return true;
 }
@@ -71,8 +74,10 @@ bool Graphics::init(const char *title, int x, int y, int width, int height, int 
  *  Update stuff.
  */
 void Graphics::update() {
-	SDL_SetRenderDrawColor(renderer, 0,0,0, 255);
-	SDL_RenderDrawLine(renderer, 10, 10, 200, 200);
+	/////////////////
+	vector<int> _x = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	vector<int> _y = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	plot->trace(renderer, GRAPH_LINES, _x, _y);
 }
 
 /**
@@ -86,7 +91,6 @@ void Graphics::render() {
 	SDL_RenderClear(renderer);
 
 	// Update the things on the screen.
-	//handle_events();
 	update();
 
 	// Show the window.
@@ -101,6 +105,7 @@ void Graphics::glLoop() {
 		frame_start = SDL_GetTicks();
 
 		// Main loop.
+		handleInput();
 		render();
 
 		frame_time = SDL_GetTicks() - frame_start;
@@ -162,4 +167,54 @@ void Graphics::draw(SDL_Texture *texture, int sx, int sy, int x, int y, unsigned
  */
 void Graphics::draw(SDL_Texture *texture, int x, int y, unsigned int width, unsigned int height) {
 	draw(texture, 0, 0, x, y, width, height);
+}
+
+/**
+ *  Handles input events.
+ *
+ *  @return False if it was a "Quit" type of event.
+ */
+bool Graphics::handleInput() {
+	keystates = SDL_GetKeyboardState(0);
+	SDL_Event event;
+
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT) {
+			return false;
+		} else if (event.type == SDL_KEYDOWN) {
+			if (isKeyDown(SDL_SCANCODE_ESCAPE)) {
+				// Escape
+				SDL_Quit();
+				exit(EXIT_SUCCESS);
+			}
+		} else if (event.type == SDL_WINDOWEVENT) {
+			switch (event.window.event) {
+			case SDL_WINDOWEVENT_RESIZED:
+				SDL_Log("Window %d resized to %dx%d",
+						event.window.windowID, event.window.data1,
+						event.window.data2);
+				break;
+			}
+		}
+	}
+
+	return true;
+}
+
+/**
+ *  Check if a key is down.
+ *
+ *  @param key SDL_Scancode for the key you want to be tested.
+ *  @return True if the key is down.
+ */
+bool Graphics::isKeyDown(SDL_Scancode key) {
+	if (keystates != 0) {
+		if (keystates[key] == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	return false;
 }

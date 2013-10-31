@@ -12,16 +12,22 @@
 #include <string>
 #include <cstdint>
 
+#include "plot.h"
+
 class Graphics {
   private:
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+
+	Plot *plot;
+
 	uint32_t frame_start;
 	uint32_t frame_time;
 	int fps;
 
-  public:
-	SDL_Window *window;
-	SDL_Renderer *renderer;
+	const uint8_t *keystates;
 
+  public:
 	bool running;
 	std::string error_message;
 
@@ -37,6 +43,9 @@ class Graphics {
 	void draw(SDL_Texture *texture, int x, int y, unsigned int width, unsigned int height);
 
 	void glLoop();
+
+	bool handleInput();
+	bool isKeyDown(SDL_Scancode key);
 };
 
 #endif
