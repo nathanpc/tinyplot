@@ -18,12 +18,7 @@ class Graphics {
   private:
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-
 	Plot *plot;
-
-	uint32_t frame_start;
-	uint32_t frame_time;
-	int fps;
 
 	const uint8_t *keystates;
 
@@ -34,7 +29,7 @@ class Graphics {
 	Graphics();
 	virtual ~Graphics();
 
-	bool init(const char *title, int x, int y, int width, int height, int fps, int flags);
+	bool init(const char *title, int x, int y, int width, int height, int flags);
 	void update();
 	void render();
 	void clean();
@@ -43,8 +38,6 @@ class Graphics {
 	void draw(SDL_Texture *texture, int x, int y, unsigned int width, unsigned int height);
 
 	void glLoop();
-
-	bool handleInput();
 	bool isKeyDown(SDL_Scancode key);
 };
 

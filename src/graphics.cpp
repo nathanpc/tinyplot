@@ -45,7 +45,7 @@ Graphics::~Graphics() {
  *  @param flags SDL init flags.
  *  @return True if everything initialized corrrectly.
  */
-bool Graphics::init(const char *title, int x, int y, int width, int height, int fps, int flags) {
+bool Graphics::init(const char *title, int x, int y, int width, int height, int flags) {
 	// Initialize SDL.
 	int sdl_init_status = SDL_Init(SDL_INIT_EVERYTHING);
 	if (sdl_init_status >= 0) {
@@ -64,8 +64,7 @@ bool Graphics::init(const char *title, int x, int y, int width, int height, int 
 		return false;
 	}
 
-	this->fps = fps;
-	plot = new Plot(width, height);
+	plot = new Plot(renderer, width, height);
 
 	return true;
 }
@@ -75,9 +74,10 @@ bool Graphics::init(const char *title, int x, int y, int width, int height, int 
  */
 void Graphics::update() {
 	/////////////////
-	vector<int> _x = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-	vector<int> _y = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-	plot->trace(renderer, GRAPH_LINES, _x, _y);
+	vector<float> _x = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	vector<float> _y = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	plot->showAxis(_x, _y);
+	plot->trace(GRAPH_LINES, _x, _y);
 }
 
 /**
@@ -101,17 +101,35 @@ void Graphics::render() {
  *  Render loop.
  */
 void Graphics::glLoop() {
-	while (running) {
-		frame_start = SDL_GetTicks();
+	keystates = SDL_GetKeyboardState(0);
+	SDL_Event event;
 
-		// Main loop.
-		handleInput();
-		render();
+	while (running && SDL_WaitEvent(&event)) {
+		switch (event.type) {
+		case SDL_USEREVENT:
+			cout << "USEREVENT" << endl;
+			break;
 
-		frame_time = SDL_GetTicks() - frame_start;
-		if (frame_time < fps) {
-			SDL_Delay((int)(fps - frame_time));
+		case SDL_KEYDOWN:
+			if (isKeyDown(SDL_SCANCODE_ESCAPE)) {
+				// Escape
+				SDL_Quit();
+				exit(EXIT_SUCCESS);
+			}
+			break;
+
+		case SDL_WINDOWEVENT:
+			switch (event.window.event) {
+			case SDL_WINDOWEVENT_RESIZED:
+				SDL_Log("Window %d resized to %dx%d",
+						event.window.windowID, event.window.data1,
+						event.window.data2);
+				break;
+			}
+			break;
 		}
+
+		render();
 	}
 }
 
@@ -167,38 +185,6 @@ void Graphics::draw(SDL_Texture *texture, int sx, int sy, int x, int y, unsigned
  */
 void Graphics::draw(SDL_Texture *texture, int x, int y, unsigned int width, unsigned int height) {
 	draw(texture, 0, 0, x, y, width, height);
-}
-
-/**
- *  Handles input events.
- *
- *  @return False if it was a "Quit" type of event.
- */
-bool Graphics::handleInput() {
-	keystates = SDL_GetKeyboardState(0);
-	SDL_Event event;
-
-	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT) {
-			return false;
-		} else if (event.type == SDL_KEYDOWN) {
-			if (isKeyDown(SDL_SCANCODE_ESCAPE)) {
-				// Escape
-				SDL_Quit();
-				exit(EXIT_SUCCESS);
-			}
-		} else if (event.type == SDL_WINDOWEVENT) {
-			switch (event.window.event) {
-			case SDL_WINDOWEVENT_RESIZED:
-				SDL_Log("Window %d resized to %dx%d",
-						event.window.windowID, event.window.data1,
-						event.window.data2);
-				break;
-			}
-		}
-	}
-
-	return true;
 }
 
 /**

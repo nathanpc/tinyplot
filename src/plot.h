@@ -17,10 +17,12 @@
 
 class Plot {
   private:
+	SDL_Renderer *renderer;
+
 	struct MinMax {
 		struct MM {
-			int min;
-			int max;
+			float min;
+			float max;
 		};
 
 		MM x;
@@ -30,18 +32,26 @@ class Plot {
 	struct Graph {
 		int width;
 		int height;
+
+		int padding;
+		int tarea_width;
+		int tarea_height;
+
+		int bottom;
+		int right_side;
 	};
 
   public:
 	Graph graph;
 
-	Plot(int width, int height);
+	Plot(SDL_Renderer *renderer, int width, int height);
 
-	void trace(SDL_Renderer *renderer, unsigned int type, std::vector<int> x, std::vector<int> y);
+	void showAxis(std::vector<float> x, std::vector<float> y);
+	void trace(unsigned int type, std::vector<float> x, std::vector<float> y);
 
 	struct Point {
-		int x;
-		int y;
+		float x;
+		float y;
 	};
 };
 

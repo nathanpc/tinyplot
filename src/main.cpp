@@ -36,7 +36,6 @@ int main(int argc, char *argv[]) {
 									   SDL_WINDOWPOS_CENTERED,
 									   1024,
 									   768,
-									   24,
 									   SDL_WINDOW_RESIZABLE |
 									   SDL_WINDOW_SHOWN);
 
