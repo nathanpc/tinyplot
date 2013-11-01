@@ -12,12 +12,15 @@
 #include <vector>
 #include <SDL.h>
 
+#include "text.h"
+
 #define GRAPH_LINES  0
 #define GRAPH_POINTS 1
 
 class Plot {
   private:
 	SDL_Renderer *renderer;
+	Text *text;
 
 	struct MinMax {
 		struct MM {
@@ -39,6 +42,8 @@ class Plot {
 
 		int bottom;
 		int right_side;
+
+		unsigned int font_size;
 	};
 
   public:

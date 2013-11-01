@@ -9,9 +9,11 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 #include <SDL.h>
 
 #include "plot.h"
+#include "text.h"
 
 using namespace std;
 
@@ -33,6 +35,10 @@ Plot::Plot(SDL_Renderer *renderer, int width, int height) {
 
 	graph.bottom = graph.tarea_height + graph.padding;
 	graph.right_side = graph.tarea_width + graph.padding;
+
+	graph.font_size = 10;
+
+	text = new Text("/usr/share/fonts/truetype/freefont/FreeSans.ttf", graph.font_size, renderer);  // TODO: Make this portable.
 }
 
 /**
@@ -55,25 +61,51 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 					   graph.padding, graph.padding,
 					   graph.padding, graph.bottom);
 
-	// Get the maximum amount of unit dashes for each axis.
+	// Drawing the unit markers.
 	static const unsigned int dash_width = 10;
+	SDL_Color color = {30, 30, 30};
+
+	MinMax minmax;
+	minmax.x.min = *min_element(x.begin(), x.end());
+	minmax.x.max = *max_element(x.begin(), x.end());
+	minmax.y.min = *min_element(y.begin(), y.end());
+	minmax.y.max = *max_element(y.begin(), y.end());
 
 	// Dashes for the Y axis.
 	float yspacing = 30;
-	float max_y_dashes = graph.tarea_height / yspacing;
-	if (max_y_dashes > y.size()) {
-		max_y_dashes = y.size();
+	float y_dashes = graph.tarea_height / yspacing;
+	
+	// TODO: Remove this.
+	if (y_dashes > y.size()) {
+		y_dashes = y.size();
 		yspacing = graph.tarea_height / y.size();
 	}
 
-	for (size_t i = 0; i < max_y_dashes; ++i) {
-		int ypos = graph.bottom - ((i + 1) * yspacing);
-		SDL_RenderDrawLine(renderer,
-						   graph.padding - dash_width, ypos,
-						   graph.padding, ypos);
-	}
+	int y_interval = (minmax.y.max - minmax.y.min) / y_dashes;
 
-	// TODO: Develop the algorithm to draw the axis points and numbers.
+	for (size_t i = 0; i < y_dashes + 1; ++i) {
+		float ypos = graph.bottom - (i * yspacing);
+		SDL_RenderDrawLine(renderer,
+						   graph.padding, ypos,
+						   graph.padding + dash_width, ypos);
+
+		// TODO: This is wrong, it should print the scale, not the array.
+		ostringstream stream;
+		float font_centering = graph.font_size / 2;
+		stream << i * y_interval;
+
+		if (stream.str().length() == 2) {
+			font_centering = graph.font_size;
+		} else if (stream.str().length() == 3) {
+			font_centering = graph.font_size + graph.font_size / 2;
+		} else if (stream.str().length() == 4) {
+			font_centering = graph.font_size * 2;
+		} else {
+			// TODO: Handle bigger values with scientific notation.
+		}
+
+		text->print(stream.str(), color, graph.padding - font_centering - dash_width, ypos - (graph.font_size / 2));
+	}
 }
 
 // TODO: Add some cursors that will follow the mouse, those are going to show the user where he is in the line.
@@ -87,7 +119,6 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
  */
 void Plot::trace(unsigned int type, vector<float> x, vector<float> y) {
 	MinMax minmax;
-
 	minmax.x.min = *min_element(x.begin(), x.end());
 	minmax.x.max = *max_element(x.begin(), x.end());
 	minmax.y.min = *min_element(y.begin(), y.end());
