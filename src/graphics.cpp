@@ -120,6 +120,8 @@ void Graphics::glLoop() {
 				SDL_Log("Window %d resized to %dx%d",
 						event.window.windowID, event.window.data1,
 						event.window.data2);
+
+				plot = new Plot(renderer, event.window.data1, event.window.data2);
 				break;
 			}
 			break;
