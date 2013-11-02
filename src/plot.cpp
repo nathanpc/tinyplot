@@ -10,9 +10,9 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <cmath>
 #include <SDL.h>
 #include <SDL_ttf.h>
-
 
 #include "plot.h"
 #include "text.h"
@@ -87,8 +87,7 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 
 		// Create the unit string.
 		ostringstream stream;
-		//stream.precision(2);
-		stream << i * y_interval;
+		stream << (floorf((i * y_interval) * 100 + 0.5) / 100);
 
 		// Get the text size to center it.
 		int width, height;
