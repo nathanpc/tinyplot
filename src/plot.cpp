@@ -87,6 +87,7 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 
 		// Create the unit string.
 		ostringstream stream;
+		//stream.precision(2);
 		stream << i * y_interval;
 
 		// Get the text size to center it.
@@ -116,6 +117,7 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 
 		// Create the unit string.
 		ostringstream stream;
+		stream.precision(2);
 		stream << i * x_interval;
 
 		// Get the text size to center it.
