@@ -57,11 +57,17 @@ void Plot::showAxis(Points points) {
 	SDL_RenderDrawLine(renderer,
 					   graph.padding, graph.bottom,
 					   graph.right_side, graph.bottom);
+	SDL_RenderDrawLine(renderer,
+					   graph.padding, graph.padding,
+					   graph.right_side, graph.padding);
 
 	// Y Axis.
 	SDL_RenderDrawLine(renderer,
 					   graph.padding, graph.padding,
 					   graph.padding, graph.bottom);
+	SDL_RenderDrawLine(renderer,
+					   graph.width - graph.padding, graph.padding,
+					   graph.width - graph.padding, graph.bottom);
 
 	// Drawing the unit markers.
 	static const unsigned int dash_size = 10;
@@ -78,6 +84,9 @@ void Plot::showAxis(Points points) {
 		SDL_RenderDrawLine(renderer,
 						   graph.padding, ypos,
 						   graph.padding + dash_size, ypos);
+		SDL_RenderDrawLine(renderer,
+						   graph.width - graph.padding, ypos,
+						   graph.width - graph.padding - dash_size, ypos);
 
 		// Create the unit string.
 		ostringstream stream;
@@ -107,6 +116,9 @@ void Plot::showAxis(Points points) {
 		SDL_RenderDrawLine(renderer,
 						   xpos, graph.bottom,
 						   xpos, graph.bottom - dash_size);
+		SDL_RenderDrawLine(renderer,
+						   xpos, graph.padding,
+						   xpos, graph.padding + dash_size);
 
 		// Create the unit string.
 		ostringstream stream;
@@ -155,6 +167,7 @@ void Plot::showMouseCursor(SDL_MouseMotionEvent mouse, SDL_Color color, Points p
 		int width;
 		TTF_SizeText(text->font, stream.str().c_str(), &width, NULL);
 
+		// Render text.
 		float xpos = (graph.width - graph.padding) - width;
 		float ypos = (graph.padding / 2) - (graph.font_size / 2);
 		text->print(stream.str(), color, xpos, ypos);
