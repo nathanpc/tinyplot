@@ -21,6 +21,7 @@ class Plot {
   private:
 	SDL_Renderer *renderer;
 	Text *text;
+	std::string font;
 
 	struct MinMax {
 		struct MM {

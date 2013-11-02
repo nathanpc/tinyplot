@@ -75,7 +75,7 @@ bool Graphics::init(const char *title, int x, int y, int width, int height, int 
 void Graphics::update() {
 	/////////////////
 	vector<float> _x = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-	vector<float> _y = { 0, 1, 2, 3, 4, 5, 10, 7, 8, 9, 100 };
+	vector<float> _y = { 0, 1, 2, 21, 4, 5, 10, 7, 12, 9, 100 };
 	plot->showAxis(_x, _y);
 	plot->trace(GRAPH_LINES, _x, _y);
 }

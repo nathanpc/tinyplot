@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
 	graphics->running = graphics->init("tinyplot",
 									   SDL_WINDOWPOS_CENTERED,
 									   SDL_WINDOWPOS_CENTERED,
-									   1024,
-									   768,
+									   810,
+									   560,
 									   SDL_WINDOW_RESIZABLE |
 									   SDL_WINDOW_SHOWN);
 

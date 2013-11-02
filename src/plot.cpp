@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <sstream>
 #include <SDL.h>
+#include <SDL_ttf.h>
+
 
 #include "plot.h"
 #include "text.h"
@@ -38,7 +40,8 @@ Plot::Plot(SDL_Renderer *renderer, int width, int height) {
 
 	graph.font_size = 10;
 
-	text = new Text("/usr/share/fonts/truetype/freefont/FreeSans.ttf", graph.font_size, renderer);  // TODO: Make this portable.
+	font = "/usr/share/fonts/truetype/freefont/FreeSans.ttf";
+	text = new Text(font.c_str(), graph.font_size, renderer);  // TODO: Make this portable.
 }
 
 /**
@@ -62,7 +65,7 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 					   graph.padding, graph.bottom);
 
 	// Drawing the unit markers.
-	static const unsigned int dash_width = 10;
+	static const unsigned int dash_size = 10;
 	SDL_Color color = {30, 30, 30};
 
 	MinMax minmax;
@@ -72,39 +75,54 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 	minmax.y.max = *max_element(y.begin(), y.end());
 
 	// Dashes for the Y axis.
-	float yspacing = 30;
-	float y_dashes = graph.tarea_height / yspacing;
-	
-	// TODO: Remove this.
-	if (y_dashes > y.size()) {
-		y_dashes = y.size();
-		yspacing = graph.tarea_height / y.size();
-	}
-
-	int y_interval = (minmax.y.max - minmax.y.min) / y_dashes;
+	float yspacing = 50;
+	int y_dashes = graph.tarea_height / yspacing;
+	float y_interval = (minmax.y.max - minmax.y.min) / y_dashes;
 
 	for (size_t i = 0; i < y_dashes + 1; ++i) {
 		float ypos = graph.bottom - (i * yspacing);
 		SDL_RenderDrawLine(renderer,
 						   graph.padding, ypos,
-						   graph.padding + dash_width, ypos);
+						   graph.padding + dash_size, ypos);
 
-		// TODO: This is wrong, it should print the scale, not the array.
+		// Create the unit string.
 		ostringstream stream;
-		float font_centering = graph.font_size / 2;
 		stream << i * y_interval;
 
-		if (stream.str().length() == 2) {
-			font_centering = graph.font_size;
-		} else if (stream.str().length() == 3) {
-			font_centering = graph.font_size + graph.font_size / 2;
-		} else if (stream.str().length() == 4) {
-			font_centering = graph.font_size * 2;
-		} else {
-			// TODO: Handle bigger values with scientific notation.
+		// Get the text size to center it.
+		int width, height;
+		TTF_SizeText(text->font, stream.str().c_str(), &width, &height);
+
+		// Just some alignment stuff.
+		float right_padding = (dash_size / 2) * stream.str().length();
+		if (stream.str().length() == 1) {
+			right_padding = dash_size;
 		}
 
-		text->print(stream.str(), color, graph.padding - font_centering - dash_width, ypos - (graph.font_size / 2));
+		float xpos = graph.padding - (width / 2) - right_padding;
+		text->print(stream.str(), color, xpos, ypos - (height / 2));
+	}
+
+	// Dashes for the X axis.
+	float xspacing = 50;
+	int x_dashes = graph.tarea_width / xspacing;
+	float x_interval = (minmax.x.max - minmax.x.min) / x_dashes;
+
+	for (size_t i = 0; i < x_dashes + 1; ++i) {
+		float xpos = graph.padding + (i * xspacing);
+		SDL_RenderDrawLine(renderer,
+						   xpos, graph.bottom,
+						   xpos, graph.bottom - dash_size);
+
+		// Create the unit string.
+		ostringstream stream;
+		stream << i * x_interval;
+
+		// Get the text size to center it.
+		int width, height;
+		TTF_SizeText(text->font, stream.str().c_str(), &width, &height);
+
+		text->print(stream.str(), color, xpos - (width / 2), graph.bottom + (height / 2));
 	}
 }
 

@@ -15,9 +15,10 @@
 class Text {
 	private:
 		SDL_Renderer *renderer;
-		TTF_Font *font;
 
 	public:
+		TTF_Font *font;
+
 		Text(std::string font_name, unsigned int font_size, SDL_Renderer *renderer);
 		~Text();
 
