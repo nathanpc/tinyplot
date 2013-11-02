@@ -53,7 +53,7 @@ class Plot {
 	Plot(SDL_Renderer *renderer, int width, int height);
 
 	void showAxis(std::vector<float> x, std::vector<float> y);
-	void trace(unsigned int type, std::vector<float> x, std::vector<float> y);
+	void trace(unsigned int type, SDL_Color color, std::vector<float> x, std::vector<float> y);
 
 	struct Point {
 		float x;

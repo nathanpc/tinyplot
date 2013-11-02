@@ -133,10 +133,11 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
  *  Plot the graph on the screen.
  *
  *  @param type Graph type.
+ *  @param color Trace color.
  *  @param x The list of X points to trace.
  *  @param y The list of Y points to trace.
  */
-void Plot::trace(unsigned int type, vector<float> x, vector<float> y) {
+void Plot::trace(unsigned int type, SDL_Color color, vector<float> x, vector<float> y) {
 	MinMax minmax;
 	minmax.x.min = *min_element(x.begin(), x.end());
 	minmax.x.max = *max_element(x.begin(), x.end());
@@ -147,7 +148,7 @@ void Plot::trace(unsigned int type, vector<float> x, vector<float> y) {
 	float py = graph.tarea_height / (minmax.y.max - minmax.y.min);
 
 	// Set the graph color.
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
 	for (size_t i = 1; i < x.size(); ++i) {
 		Point p1;
