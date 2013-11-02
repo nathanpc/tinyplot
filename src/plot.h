@@ -18,11 +18,7 @@
 #define GRAPH_POINTS 1
 
 class Plot {
-  private:
-	SDL_Renderer *renderer;
-	Text *text;
-	std::string font;
-
+  protected:
 	struct MinMax {
 		struct MM {
 			float min;
@@ -47,18 +43,31 @@ class Plot {
 		unsigned int font_size;
 	};
 
-  public:
-	Graph graph;
-
-	Plot(SDL_Renderer *renderer, int width, int height);
-
-	void showAxis(std::vector<float> x, std::vector<float> y);
-	void trace(unsigned int type, SDL_Color color, std::vector<float> x, std::vector<float> y);
-
 	struct Point {
 		float x;
 		float y;
 	};
+
+  private:
+	SDL_Renderer *renderer;
+	Text *text;
+	std::string font;
+
+  public:
+	Graph graph;
+
+	struct Points {
+		std::vector<float> x;
+		std::vector<float> y;
+	};
+
+	Plot(SDL_Renderer *renderer, int width, int height);
+
+	void showAxis(Points points);
+	void showMouseCursor(SDL_MouseMotionEvent mouse, SDL_Color color, Points points);
+	void trace(unsigned int type, SDL_Color color, Points points);
+
+	MinMax getMinMax(Points points);
 };
 
 #endif

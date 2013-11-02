@@ -47,10 +47,9 @@ Plot::Plot(SDL_Renderer *renderer, int width, int height) {
 /**
  *  Draw the graph axis.
  *
- *  @param x The list of X points to trace.
- *  @param xyThe list of Y points to trace.
+ *  @param points Points to trace.
  */
-void Plot::showAxis(vector<float> x, vector<float> y) {
+void Plot::showAxis(Points points) {
 	// Set the graph color.
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -67,12 +66,7 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 	// Drawing the unit markers.
 	static const unsigned int dash_size = 10;
 	SDL_Color color = {30, 30, 30};
-
-	MinMax minmax;
-	minmax.x.min = *min_element(x.begin(), x.end());
-	minmax.x.max = *max_element(x.begin(), x.end());
-	minmax.y.min = *min_element(y.begin(), y.end());
-	minmax.y.max = *max_element(y.begin(), y.end());
+	MinMax minmax = getMinMax(points);
 
 	// Dashes for the Y axis.
 	float yspacing = 50;
@@ -127,22 +121,55 @@ void Plot::showAxis(vector<float> x, vector<float> y) {
 	}
 }
 
-// TODO: Add some cursors that will follow the mouse, those are going to show the user where he is in the line.
+/**
+ *  Show cursors that follow the mouse and display the point information
+ *  to the user.
+ *
+ *  @param mouse SDL mouse motion event struct.
+ *  @param color Matching trace color.
+ *  @param points Graph points.
+ */
+void Plot::showMouseCursor(SDL_MouseMotionEvent mouse, SDL_Color color, Points points) {
+	MinMax minmax = getMinMax(points);
+
+	float px = graph.tarea_width / (minmax.x.max - minmax.x.min);
+	float py = graph.tarea_height / (minmax.y.max - minmax.y.min);
+
+	// Set the cursor color.
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+	if ((mouse.x > graph.padding) && (mouse.x < (graph.width - graph.padding)) && (mouse.y < graph.bottom) && (mouse.y > graph.padding)) {
+		// Render cursors
+		SDL_RenderDrawLine(renderer, graph.padding, mouse.y, mouse.x, mouse.y);
+		SDL_RenderDrawLine(renderer, mouse.x, mouse.y, mouse.x, graph.bottom);
+
+		// Get graph's X and Y.
+		float x = floorf(((mouse.x - graph.padding) / px) * 100 + 0.5) / 100;
+		float y = floorf(((graph.bottom - mouse.y) / py) * 100 + 0.5) / 100;
+
+		// Create the position string.
+		ostringstream stream;
+		stream << "(" << x << ", " << y << ")";
+
+		// Get the text size to position it correctly.
+		int width;
+		TTF_SizeText(text->font, stream.str().c_str(), &width, NULL);
+
+		float xpos = (graph.width - graph.padding) - width;
+		float ypos = (graph.padding / 2) - (graph.font_size / 2);
+		text->print(stream.str(), color, xpos, ypos);
+	}
+}
 
 /**
  *  Plot the graph on the screen.
  *
  *  @param type Graph type.
  *  @param color Trace color.
- *  @param x The list of X points to trace.
- *  @param y The list of Y points to trace.
+ *  @param points Points to trace.
  */
-void Plot::trace(unsigned int type, SDL_Color color, vector<float> x, vector<float> y) {
-	MinMax minmax;
-	minmax.x.min = *min_element(x.begin(), x.end());
-	minmax.x.max = *max_element(x.begin(), x.end());
-	minmax.y.min = *min_element(y.begin(), y.end());
-	minmax.y.max = *max_element(y.begin(), y.end());
+void Plot::trace(unsigned int type, SDL_Color color, Points points) {
+	MinMax minmax = getMinMax(points);
 
 	float px = graph.tarea_width / (minmax.x.max - minmax.x.min);
 	float py = graph.tarea_height / (minmax.y.max - minmax.y.min);
@@ -150,14 +177,14 @@ void Plot::trace(unsigned int type, SDL_Color color, vector<float> x, vector<flo
 	// Set the graph color.
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-	for (size_t i = 1; i < x.size(); ++i) {
+	for (size_t i = 1; i < points.x.size(); ++i) {
 		Point p1;
 		Point p2;
 
-		p1.x = graph.padding + x[i - 1] * px;
-		p1.y = graph.bottom - y[i - 1] * py;
-		p2.x = graph.padding + x[i] * px;
-		p2.y = graph.bottom - y[i] * py;
+		p1.x = graph.padding + points.x[i - 1] * px;
+		p1.y = graph.bottom - points.y[i - 1] * py;
+		p2.x = graph.padding + points.x[i] * px;
+		p2.y = graph.bottom - points.y[i] * py;
 
 		switch (type) {
 		case GRAPH_LINES:
@@ -165,4 +192,21 @@ void Plot::trace(unsigned int type, SDL_Color color, vector<float> x, vector<flo
 			break;
 		}
 	}
+}
+
+/**
+ *  Gets the MinMax points.
+ *
+ *  @param points Points.
+ *  @return MinMax for points.
+ */
+Plot::MinMax Plot::getMinMax(Points points) {
+	MinMax minmax;
+
+	minmax.x.min = *min_element(points.x.begin(), points.x.end());
+	minmax.x.max = *max_element(points.x.begin(), points.x.end());
+	minmax.y.min = *min_element(points.y.begin(), points.y.end());
+	minmax.y.max = *max_element(points.y.begin(), points.y.end());
+
+	return minmax;
 }

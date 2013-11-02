@@ -24,6 +24,17 @@ Graphics::Graphics() {
 	plot = NULL;
 
 	running = false;
+
+	
+	vector<float> _x = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	vector<float> _y = { 0, 1, 2, 21, 4, 5, 10, 7, 12, 9, 100 };
+
+	vector<float> _x2 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	vector<float> _y2 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+	
+	graphs.push_back({ _x, _y });
+	graphs.push_back({ _x2, _y2 });
 }
 
 /**
@@ -74,28 +85,12 @@ bool Graphics::init(const char *title, int x, int y, int width, int height, int 
  */
 void Graphics::update() {
 	/////////////////
-	vector<float> _x = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-	vector<float> _y = { 0, 1, 2, 21, 4, 5, 10, 7, 12, 9, 100 };
 	SDL_Color color = { 0, 80, 130, 255 };
-	plot->showAxis(_x, _y);
-	plot->trace(GRAPH_LINES, color, _x, _y);
-}
+	plot->showAxis(graphs[0]);
+	plot->trace(GRAPH_LINES, color, graphs[0]);
 
-/**
- *  Render stuff.
- */
-void Graphics::render() {
-	// Set the background color.
-	SDL_SetRenderDrawColor(renderer, 240, 240, 240, 255);
-
-	// Clear window.
-	SDL_RenderClear(renderer);
-
-	// Update the things on the screen.
-	update();
-
-	// Show the window.
-	SDL_RenderPresent(renderer);
+	SDL_Color color2 = { 130, 0, 0, 255 };
+	plot->trace(GRAPH_LINES, color2, graphs[1]);
 }
 
 /**
@@ -105,7 +100,15 @@ void Graphics::glLoop() {
 	keystates = SDL_GetKeyboardState(0);
 	SDL_Event event;
 
+	////////////////
+	SDL_Color color = { 0, 80, 130, 255 };
+	///////////////
+
 	while (running && SDL_WaitEvent(&event)) {
+		// Set the background color and clear the window.
+		SDL_SetRenderDrawColor(renderer, 240, 240, 240, 255);
+		SDL_RenderClear(renderer);
+
 		switch (event.type) {
 		case SDL_KEYDOWN:
 			if (isKeyDown(SDL_SCANCODE_ESCAPE)) {
@@ -113,6 +116,10 @@ void Graphics::glLoop() {
 				SDL_Quit();
 				exit(EXIT_SUCCESS);
 			}
+			break;
+
+		case SDL_MOUSEMOTION:
+			plot->showMouseCursor(event.motion, color, graphs[0]);
 			break;
 
 		case SDL_WINDOWEVENT:
@@ -128,7 +135,11 @@ void Graphics::glLoop() {
 			break;
 		}
 
-		render();
+		// Update the graphs on the screen.
+		update();
+
+		// Show the window.
+		SDL_RenderPresent(renderer);
 	}
 }
 
