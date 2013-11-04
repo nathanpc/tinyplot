@@ -7,14 +7,15 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <SDL.h>
 
 #include "clog.h"
-#include "graphics.h"
+#include "tinyplot.h"
 
 #define VERSION "0.1a"
 using namespace std;
 
-Graphics *graphics;
+TinyPlot *tinyplot;
 
 void about();
 
@@ -29,22 +30,23 @@ int main(int argc, char *argv[]) {
 	// Print the usual "About" message.
 	about();
 
-	// Initialize the graph window.
-	graphics = new Graphics();
-	graphics->running = graphics->init("tinyplot",
-									   SDL_WINDOWPOS_CENTERED,
-									   SDL_WINDOWPOS_CENTERED,
-									   810,
-									   560,
-									   SDL_WINDOW_RESIZABLE |
-									   SDL_WINDOW_SHOWN);
+	// Initialize tinyplot.
+	tinyplot = new TinyPlot();
 
-	if (!graphics->running) {
-		Log::Error(graphics->error_message);
+	vector<float> x = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	vector<float> y = { 0, 1, 2, 21, 4, 5, 10, 7, 12, 9, 100 };
+
+	vector<float> x2 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	vector<float> y2 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+	tinyplot->addGraph(x, y, TinyPlot::Blue);
+	tinyplot->addGraph(x2, y2, TinyPlot::Red);
+	bool res = tinyplot->showGraph();
+
+	if (!res) {
+		Log::Error(tinyplot->getErrorMessage());
 		return EXIT_FAILURE;
 	}
-
-	graphics->glLoop();
 
 	return EXIT_SUCCESS;
 }

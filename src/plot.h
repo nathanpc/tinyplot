@@ -64,7 +64,7 @@ class Plot {
 	Plot(SDL_Renderer *renderer, int width, int height);
 
 	void showAxis(Points points);
-	void showMouseCursor(SDL_MouseMotionEvent mouse, SDL_Color color, Points points);
+	void showMouseCursor(SDL_MouseMotionEvent mouse, unsigned int n, SDL_Color color, Points points);
 	void trace(unsigned int type, SDL_Color color, Points points);
 
 	MinMax getMinMax(Points points);

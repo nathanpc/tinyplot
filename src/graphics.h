@@ -21,13 +21,13 @@ class Graphics {
 	SDL_Renderer *renderer;
 
 	Plot *plot;
-	std::vector<Plot::Points> graphs;
-
 	const uint8_t *keystates;
 
   public:
 	bool running;
 	std::string error_message;
+	std::vector<Plot::Points> graphs;
+	std::vector<SDL_Color> colors;
 
 	Graphics();
 	virtual ~Graphics();

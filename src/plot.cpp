@@ -138,10 +138,11 @@ void Plot::showAxis(Points points) {
  *  to the user.
  *
  *  @param mouse SDL mouse motion event struct.
+ *  @param n Collumn number.
  *  @param color Matching trace color.
  *  @param points Graph points.
  */
-void Plot::showMouseCursor(SDL_MouseMotionEvent mouse, SDL_Color color, Points points) {
+void Plot::showMouseCursor(SDL_MouseMotionEvent mouse, unsigned int n, SDL_Color color, Points points) {
 	MinMax minmax = getMinMax(points);
 
 	float px = graph.tarea_width / (minmax.x.max - minmax.x.min);
@@ -168,7 +169,7 @@ void Plot::showMouseCursor(SDL_MouseMotionEvent mouse, SDL_Color color, Points p
 		TTF_SizeText(text->font, stream.str().c_str(), &width, NULL);
 
 		// Render text.
-		float xpos = (graph.width - graph.padding) - width;
+		float xpos = (graph.width - graph.padding) - width - (graph.font_size * 9 * n);
 		float ypos = (graph.padding / 2) - (graph.font_size / 2);
 		text->print(stream.str(), color, xpos, ypos);
 	}
